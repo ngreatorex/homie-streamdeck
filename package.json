@@ -1,0 +1,13 @@
+{
+  "name": "homie-streamdeck",
+  "version": "0.0.1",
+  "description": "Present an Elgato Stream Deck as a Homie MQTT device",
+  "main": "index.js",
+  "author": "Neil Greatorex <neil@greatorex.me.uk>",
+  "license": "MIT",
+  "dependencies": {
+    "elgato-stream-deck": "^3.2.0",
+    "homie-device": "^3.0.1",
+    "sharp": "^0.23.4"
+  }
+}
