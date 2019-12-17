@@ -11,7 +11,7 @@ var serialNumber = myStreamDeck.getSerialNumber();
 
 var homieConfig = {
 	"name": "Homie Streamdeck",
-	"device_id": "homie-streamdeck-"+serialNumber,
+	"device_id": "streamdeck_"+serialNumber,
 	"mqtt": {
 		"host": "localhost",
 		"poer": 1883,
