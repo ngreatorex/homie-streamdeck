@@ -33,7 +33,7 @@ var buttonNodes = [];
 
 for (let i=0; i < myStreamDeck.NUM_KEYS; i++) {
 	var buttonNode = myHomieDevice.node('button_'+i, 'Streamdeck Button', 'button');
-	buttonNode.advertise('pressed').setName('Button Pressed').setDatatype('boolean');
+	buttonNode.advertise('pressed').setName('Button '+i+' Pressed').setDatatype('boolean');
 
 	buttonNodes.push(buttonNode);
 
