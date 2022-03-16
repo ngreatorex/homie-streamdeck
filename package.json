@@ -6,8 +6,8 @@
   "author": "Neil Greatorex <neil@greatorex.me.uk>",
   "license": "MIT",
   "dependencies": {
+    "@chrispyduck/homie-device": "^0.1.34",
     "elgato-stream-deck": "^3.2.0",
-    "homie-device": "^3.0.1",
     "sharp": "^0.23.4"
   }
 }

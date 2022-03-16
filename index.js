@@ -1,5 +1,5 @@
 const { openStreamDeck } = require('elgato-stream-deck');
-const HomieDevice = require('homie-device'); 
+const { HomieDevice } = require('@chrispyduck/homie-device');
 const path = require('path');
 const sharp = require('sharp');
 
@@ -10,30 +10,43 @@ var myStreamDeck = openStreamDeck();
 var serialNumber = myStreamDeck.getSerialNumber();
 
 var homieConfig = {
-	"name": "Homie Streamdeck",
-	"device_id": "streamdeck_"+serialNumber,
+	"friendlyName": "Homie Stream Deck",
+	"name": "streamdeck-"+serialNumber,
+	"firmwareName": package.name,
+	"firmwareVersion": package.version,
 	"mqtt": {
-		"host": "localhost",
-		"port": 1883,
-		"base_topic": "homie/"
+		"client": {
+			"host": "localhost",
+			"port": 1883
+		},
+		"base_topic": "homie-test"
 	}
 };
 
 if (config) {
 	if (config.mqtt_host)
-		homieConfig.mqtt.host = config.mqtt_host;
+		homieConfig.mqtt.client.host = config.mqtt_host;
 	if (config.mqtt_port)
-		homieConfig.mqtt.port = config.mqtt_port;
+		homieConfig.mqtt.client.port = config.mqtt_port;
 }
 
 var myHomieDevice = new HomieDevice(homieConfig);
-myHomieDevice.setFirmware(package.name, package.version);
 
 var buttonNodes = [];
 
-for (let i=0; i < myStreamDeck.NUM_KEYS; i++) {
-	var buttonNode = myHomieDevice.node('button_'+i, 'Streamdeck Button', 'button');
-	buttonNode.advertise('pressed').setName('Button '+i+' Pressed').setDatatype('boolean');
+for (var i=0; i < myStreamDeck.NUM_KEYS; i++) {
+	var buttonNode = myHomieDevice.node({
+		'name': 'button-'+i,
+		'friendlyName': 'Streamdeck Button',
+		'type': 'button'
+	});
+
+	buttonNode.addProperty({
+		'name': 'pressed',
+		'friendlyName': 'Button '+i+' Pressed',
+		'dataType': 'boolean',
+		'settable': false
+	});
 
 	buttonNodes.push(buttonNode);
 
@@ -55,12 +68,12 @@ for (let i=0; i < myStreamDeck.NUM_KEYS; i++) {
 
 myStreamDeck.on('down', keyIndex => {
 	console.log('Key %d down', keyIndex);
-	buttonNodes[keyIndex].setProperty('pressed').send('true');
+	buttonNodes[keyIndex].getProperty('pressed').publishValue('true');
 });
  
 myStreamDeck.on('up', keyIndex => {
 	console.log('Key %d up', keyIndex);
-	buttonNodes[keyIndex].setProperty('pressed').send('false');
+	buttonNodes[keyIndex].getProperty('pressed').publishValue('false');
 });
  
 myStreamDeck.on('error', error => {
@@ -69,8 +82,8 @@ myStreamDeck.on('error', error => {
 
 myHomieDevice.on('connect', () => {
 	console.log("Connected");
-	for (let i = 0; i < buttonNodes.length; i++) {
-		buttonNodes[i].setProperty('pressed').send('false');
+	for (var i = 0; i < buttonNodes.length; i++) {
+		buttonNodes[i].getProperty('pressed').publishValue('false');
 	}
 });
  
