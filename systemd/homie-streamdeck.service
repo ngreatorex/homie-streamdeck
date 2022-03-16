@@ -1,0 +1,19 @@
+[Unit]
+Description=Homie Stream Deck
+Documentation=https://github.com/ngreatorex/homie-streamdeck
+Wants=network-online.target
+After=network-online.target
+After=openhab.service
+
+[Service]
+Type=exec
+ExecStart=/usr/bin/node /home/neil/streamdeck/homie-streamdeck/index.js
+Restart=on-success
+User=nobody
+Group=users
+#Environment=PATH=/usr/bin/
+Environment=NODE_ENV=production
+WorkingDirectory=/home/neil/streamdeck/homie-streamdeck
+
+[Install]
+WantedBy=multi-user.target
