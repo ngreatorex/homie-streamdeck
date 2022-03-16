@@ -1,25 +1,48 @@
-const { openStreamDeck } = require('elgato-stream-deck');
-const { HomieDevice } = require('@chrispyduck/homie-device');
-const path = require('path');
-const sharp = require('sharp');
+import { openStreamDeck } from '@elgato-stream-deck/node';
+import { HomieDevice } from '@chrispyduck/homie-device';
+import path from 'path';
+import sharp from 'sharp';
+import { default as winston, format, transports } from 'winston';
 
-const package = require('./package.json');
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
+const packageInfo = require('./package.json');
 const config = require('./config.json');
 
-var myStreamDeck = openStreamDeck();
-var serialNumber = myStreamDeck.getSerialNumber();
+winston.configure({
+	level: 'debug',
+	transports: [
+		new transports.Console({
+			format: format.combine(
+				format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss.SSS' }),
+				format.colorize(),
+				format.padLevels(),
+				format.splat(),
+				format.printf(info => `[${info.timestamp}] ${info.level}: ${info.message}`)
+			)
+		})
+	]
+});
 
-var homieConfig = {
+const logger = winston.child({
+	name: packageInfo.name
+});
+
+let myStreamDeck = await openStreamDeck();
+let serialNumber = await myStreamDeck.getSerialNumber();
+
+let homieConfig = {
 	"friendlyName": "Homie Stream Deck",
 	"name": "streamdeck-"+serialNumber,
-	"firmwareName": package.name,
-	"firmwareVersion": package.version,
+	"firmwareName": packageInfo.name,
+	"firmwareVersion": packageInfo.version,
 	"mqtt": {
 		"client": {
 			"host": "localhost",
 			"port": 1883
 		},
-		"base_topic": "homie-test"
+		"base_topic": "homie"
 	}
 };
 
@@ -50,38 +73,38 @@ for (var i=0; i < myStreamDeck.NUM_KEYS; i++) {
 
 	buttonNodes.push(buttonNode);
 
-	sharp(path.resolve(__dirname, i+'.png'))
-		.flatten()
-		.resize(myStreamDeck.ICON_SIZE, myStreamDeck.ICON_SIZE)
-		.raw()
-		.toBuffer()
-		.then(buffer => {
-			
-			console.log("Loading key image for key " + i);
-			myStreamDeck.fillImage(i, buffer);
-		})
-		.catch(err => {
-			console.log("Unable to find %d.png - setting key to black", i);
-			myStreamDeck.fillColor(i, 0, 0, 0);
-		});
+	try {
+		logger.info("Loading key image from key %d...", i);
+		const img = await sharp(i+'.png')
+			.flatten()
+			.resize(myStreamDeck.ICON_SIZE, myStreamDeck.ICON_SIZE)
+			.raw()
+			.toBuffer();
+
+		logger.info("Loaded key image for key %d. Writing to Stream Deck...", i);
+		myStreamDeck.fillKeyBuffer(i, img);
+	} catch (err) {
+		logger.info("Unable to find %d.png - setting key to black", i);
+		myStreamDeck.fillKeyColor(i, 0, 0, 0);
+	}
 }
 
 myStreamDeck.on('down', keyIndex => {
-	console.log('Key %d down', keyIndex);
+	logger.info('Key %d down', keyIndex);
 	buttonNodes[keyIndex].getProperty('pressed').publishValue('true');
 });
  
 myStreamDeck.on('up', keyIndex => {
-	console.log('Key %d up', keyIndex);
+	logger.info('Key %d up', keyIndex);
 	buttonNodes[keyIndex].getProperty('pressed').publishValue('false');
 });
  
 myStreamDeck.on('error', error => {
-	console.error(error);
+	logger.error(error);
 });
 
 myHomieDevice.on('connect', () => {
-	console.log("Connected");
+	logger.info("Connected to MQTT");
 	for (var i = 0; i < buttonNodes.length; i++) {
 		buttonNodes[i].getProperty('pressed').publishValue('false');
 	}
