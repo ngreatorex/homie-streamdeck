@@ -1,6 +1,6 @@
 {
   "name": "homie-streamdeck",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "description": "Present an Elgato Stream Deck as a Homie MQTT device",
   "main": "index.js",
