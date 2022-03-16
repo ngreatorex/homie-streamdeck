@@ -14,7 +14,7 @@ var homieConfig = {
 	"device_id": "streamdeck_"+serialNumber,
 	"mqtt": {
 		"host": "localhost",
-		"poer": 1883,
+		"port": 1883,
 		"base_topic": "homie/"
 	}
 };
@@ -65,6 +65,13 @@ myStreamDeck.on('up', keyIndex => {
  
 myStreamDeck.on('error', error => {
 	console.error(error);
+});
+
+myHomieDevice.on('connect', () => {
+	console.log("Connected");
+	for (let i = 0; i < buttonNodes.length; i++) {
+		buttonNodes[i].setProperty('pressed').send('false');
+	}
 });
  
 myHomieDevice.setup();
