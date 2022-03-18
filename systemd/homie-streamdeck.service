@@ -7,13 +7,13 @@ After=openhab.service
 
 [Service]
 Type=exec
-ExecStart=/usr/bin/node /home/neil/streamdeck/homie-streamdeck/index.js
+ExecStart=/usr/bin/node /home/neil/homie-streamdeck/index.js
 Restart=on-success
 User=nobody
-Group=users
+Group=plugdev
 #Environment=PATH=/usr/bin/
 Environment=NODE_ENV=production
-WorkingDirectory=/home/neil/streamdeck/homie-streamdeck
+WorkingDirectory=/home/neil/homie-streamdeck
 
 [Install]
 WantedBy=multi-user.target
