@@ -7,8 +7,8 @@ After=openhab.service
 
 [Service]
 Type=exec
-ExecStart=/usr/bin/node /home/neil/homie-streamdeck/index.js
-Restart=on-success
+ExecStart=/usr/bin/node index.js
+Restart=on-failure
 User=nobody
 Group=plugdev
 #Environment=PATH=/usr/bin/
