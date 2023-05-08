@@ -1,5 +1,5 @@
 import { openStreamDeck } from '@elgato-stream-deck/node';
-import { HomieDevice } from '@chrispyduck/homie-device';
+import { HomieDevice } from '@ngreatorex/homie-device';
 import path from 'path';
 import sharp from 'sharp';
 import { default as winston, format, transports } from 'winston';
