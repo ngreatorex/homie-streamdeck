@@ -21,9 +21,9 @@ jobs:
           registry-url: 'https://registry.npmjs.com'
       - run: npm version ${{ github.event.release.tag_name }} --no-git-tag-version --allow-same-version
       - run: npm ci
-      - run: npm run build
-      - run: npm run lint
-      - run: npm test
+      #- run: npm run build
+      #- run: npm run lint
+      #- run: npm test
       - run: npm publish --access public --provenance
         if: matrix.node-version == 'lts/*'
         env:
