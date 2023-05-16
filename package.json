@@ -6,6 +6,10 @@
   "main": "index.js",
   "author": "Neil Greatorex <neil@greatorex.me.uk>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ngreatorex/homie-streamdeck"
+  },
   "dependencies": {
     "@ngreatorex/homie-device": "0.2.1-pre",
     "@elgato-stream-deck/node": "^5.3.1",
