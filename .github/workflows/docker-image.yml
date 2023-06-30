@@ -21,8 +21,8 @@ jobs:
       with:
         # list of Docker images to use as base name for tags
         images: |
-          ngreatorex/homie-streamdeck
-          ghcr.io/ngreatorex/homie-streamdeck
+          name=ngreatorex/homie-streamdeck
+          name=ghcr.io/ngreatorex/homie-streamdeck,enable=${{ github.event_name != 'pull_request' }}
         # generate Docker tags based on the following events/attributes
         tags: |
           type=ref,event=branch
@@ -38,6 +38,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Login to GHCR
       uses: docker/login-action@v2
+      if: github.event_name != 'pull_request'
       with:
         registry: ghcr.io
         username: ${{ github.repository_owner }}
