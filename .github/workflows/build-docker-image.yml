@@ -23,6 +23,13 @@ on:
 jobs:
   build-image:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - linux/amd64
+          - linux/arm/v7
+          - linux/arm64
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -62,7 +69,7 @@ jobs:
       with:
         config-inline: |
           [worker.oci]
-            max-parallelism = 1
+            max-parallelism = 2
     - name: Build and push
       uses: docker/build-push-action@v5
       with:
@@ -70,5 +77,5 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        platforms: linux/amd64,linux/arm64,linux/arm/v7
+        platforms: ${{ matrix.platform }}
 
