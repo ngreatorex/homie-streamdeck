@@ -10,16 +10,8 @@ on:
     types: [published]
     
 jobs:
-  build-base-image:
-    uses: ./.github/workflows/build-docker-image.yml
-    with:
-      push-to-docker-hub: ${{ github.event_name != 'pull_request' }}
-      push-to-ghcr: ${{ github.event_name == 'pull_request' }}
-      path: .
-    secrets: inherit
 
   enumerate-config-dirs:
-    needs: build-base-image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -30,9 +22,20 @@ jobs:
           echo "matrix=$(ls -l config/ | grep '^d' | awk -F ' ' '{print $9}' | grep -v '^images$' | jq -R -s -c 'split(\"\n\") | map(select(length > 0)) | {\"subdir\": .}') >> $GITHUB_OUTPUT"
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+  
+  build-base-image:
+    needs: enumerate-config-dirs
+    uses: ./.github/workflows/build-docker-image.yml
+    with:
+      push-to-docker-hub: ${{ github.event_name != 'pull_request' }}
+      push-to-ghcr: ${{ github.event_name == 'pull_request' }}
+      path: .
+    secrets: inherit
 
   build-config-images:
-    needs: enumerate-config-dirs
+    needs: 
+      - enumerate-config-dirs
+      - build-base-image
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
