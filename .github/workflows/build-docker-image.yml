@@ -1,16 +1,27 @@
-name: Docker Image CI
+name: Docker Image Builder
 
 on:
-  push:
-    branches: [ "master" ]
-    tags: [ "v*.*.*" ]
-  pull_request:
-    branches: [ "master" ]
-  release:
-    types: [published]
+  workflow_call:
+    inputs:
+      push-to-docker-hub:
+        description: 'Whether the image should be pushed to Docker hub'
+        required: true
+        type: boolean
+      push-to-ghcr:
+        description: 'Whether the image should be pushed to GHCR'
+        required: true
+        type: boolean
+      path:
+        description: 'The path to the Dockerfile to build'
+        required: true
+        type: string
+    secrets:
+      DOCKERHUB_TOKEN:
+        description: 'The token used to access Docker hub'
+        required: true
     
 jobs:
-  build-base-image:
+  build-image:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -21,8 +32,8 @@ jobs:
       with:
         # list of Docker images to use as base name for tags
         images: |
-          name=ngreatorex/homie-streamdeck
-          name=ghcr.io/ngreatorex/homie-streamdeck,enable=${{ github.event_name != 'pull_request' }}
+          name=ngreatorex/homie-streamdeck,enable=${{ inputs.push-to-docker-hub }}
+          name=ghcr.io/ngreatorex/homie-streamdeck,enable=${{ inputs.push-to-ghcr }}
         # generate Docker tags based on the following events/attributes
         tags: |
           type=ref,event=branch
@@ -33,12 +44,13 @@ jobs:
           type=sha
     - name: Login to Docker Hub
       uses: docker/login-action@v2
+      if: inputs.push-to-docker-hub
       with:
         username: ${{ vars.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Login to GHCR
       uses: docker/login-action@v2
-      if: github.event_name != 'pull_request'
+      if: inputs.push-to-ghcr
       with:
         registry: ghcr.io
         username: ${{ github.repository_owner }}
@@ -55,15 +67,4 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         platforms: linux/amd64,linux/arm64,linux/arm/v7
-  enumerate-config-dirs:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Generate matrix with all config sub-directories
-        id: set-matrix
-        run: |
-          echo "::set-output name=matrix::$(ls -l config/ | grep '^d' | awk -F ' ' '{print $9}' | grep -v '^images$' | jq -R -s -c 'split("\n") | map(select(length > 0))')"
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-  build-config-images:
-    
+

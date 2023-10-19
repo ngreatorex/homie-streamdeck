@@ -1,0 +1,47 @@
+name: Docker CI
+
+on:
+  push:
+    branches: [ "master" ]
+    tags: [ "v*.*.*" ]
+  pull_request:
+    branches: [ "master" ]
+  release:
+    types: [published]
+    
+jobs:
+  build-base-image:
+    uses: ./.github/workflows/build-docker-image.yml
+    with:
+      push-to-docker-hub: ${{ github.event_name != 'pull-request' }}
+      push-to-ghcr: ${{ github.event_name == 'pull-request' }}
+      path: .
+    secrets: inherit
+
+  enumerate-config-dirs:
+    needs: build-base-image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Generate matrix with all config sub-directories
+        id: set-matrix
+        run: |
+          echo "::set-output name=matrix::$(ls -l config/ | grep '^d' | awk -F ' ' '{print $9}' | grep -v '^images$' | jq -R -s -c 'split("\n") | map(select(length > 0))')"
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+
+  build-config-images:
+    needs: enumerate-config-dirs
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        subdir: ${{ fromJson(needs.enumerate-config-dirs.outputs.matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Echo matrix
+        run: |
+          echo "${{ matrix.subdir }}"
+    
