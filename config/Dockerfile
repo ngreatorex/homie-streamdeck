@@ -1,4 +1,4 @@
-FROM ngreatorex/homie-streamdeck:pr-12
+FROM ngreatorex/homie-streamdeck:master
 
 WORKDIR /app
 COPY . .
