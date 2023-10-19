@@ -33,7 +33,7 @@ jobs:
         # list of Docker images to use as base name for tags
         images: |
           name=ngreatorex/homie-streamdeck,enable=${{ inputs.push-to-docker-hub }}
-          name=ghcr.io/ngreatorex/homie-streamdeck,enable=${{ inputs.push-to-ghcr }}
+          name=ghcr.io/${{ github.actor }}/homie-streamdeck,enable=${{ inputs.push-to-ghcr }}
         # generate Docker tags based on the following events/attributes
         tags: |
           type=ref,event=branch
@@ -53,7 +53,7 @@ jobs:
       if: inputs.push-to-ghcr
       with:
         registry: ghcr.io
-        username: ${{ github.repository_owner }}
+        username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
