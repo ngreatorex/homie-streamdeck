@@ -10,7 +10,7 @@ on:
     types: [published]
     
 jobs:
-  build:
+  build-base-image:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -55,3 +55,15 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         platforms: linux/amd64,linux/arm64,linux/arm/v7
+  enumerate-config-dirs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Generate matrix with all config sub-directories
+        id: set-matrix
+        run: |
+          echo "::set-output name=matrix::$(ls -l config/ | grep '^d' | awk -F ' ' '{print $9}' | grep -v '^images$' | jq -R -s -c 'split("\n") | map(select(length > 0))')"
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+  build-config-images:
+    
