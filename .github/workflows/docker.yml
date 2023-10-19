@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Generate matrix with all config sub-directories
         id: set-matrix
         run: |
@@ -42,7 +42,7 @@ jobs:
       matrix: ${{ fromJson(needs.enumerate-config-dirs.outputs.matrix) }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Echo matrix
         run: |
           echo "${{ matrix.subdir }}"
