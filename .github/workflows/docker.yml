@@ -36,8 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        subdir: ${{ fromJson(needs.enumerate-config-dirs.outputs.matrix }}
+      matrix: ${{ fromJson(needs.enumerate-config-dirs.outputs.matrix }}
     with:
       subdir: ${{ matrix.subdir }}
     steps:
