@@ -27,7 +27,7 @@ jobs:
       - name: Generate matrix with all config sub-directories
         id: set-matrix
         run: |
-          echo "::set-output name=matrix::$(ls -l config/ | grep '^d' | awk -F ' ' '{print $9}' | grep -v '^images$' | jq -R -s -c 'split(\"\n\") | map(select(length > 0))')"
+          echo "::set-output name=matrix::$(ls -l config/ | grep '^d' | awk -F ' ' '{print $9}' | grep -v '^images$' | jq -R -s -c 'split(\"\n\") | map(select(length > 0)) | {\"subdir\": .}')"
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
 
