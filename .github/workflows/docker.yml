@@ -37,12 +37,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.enumerate-config-dirs.outputs.matrix) }}
-    with:
-      subdir: ${{ matrix.subdir }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Echo matrix
         run: |
-          echo "${{ vars.subdir }}"
+          echo "${{ matrix.subdir }}"
     
