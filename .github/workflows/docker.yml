@@ -9,6 +9,9 @@ on:
   release:
     types: [published]
     
+env:
+  PLATFORMS: '["linux/amd64","linux/arm/v7","linux/arm64"]'
+
 jobs:
 
   enumerate-config-dirs:
@@ -26,7 +29,12 @@ jobs:
   build-base-image:
     needs: enumerate-config-dirs
     uses: ./.github/workflows/build-docker-image.yml
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: ${{ fromJson(env.PLATFORMS) }}
     with:
+      platform: ${{ matrix.platform }}
       push-to-docker-hub: ${{ github.event_name != 'pull_request' }}
       push-to-ghcr: ${{ github.event_name == 'pull_request' }}
       path: .
@@ -39,7 +47,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.enumerate-config-dirs.outputs.matrix) }}
+      matrix: 
+        platform: ${{ fromJson(env.PLATFORMS) }} 
+        subdir: ${{ fromJson(needs.enumerate-config-dirs.outputs.matrix) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4

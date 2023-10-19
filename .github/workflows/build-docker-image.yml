@@ -3,6 +3,10 @@ name: Docker Image Builder
 on:
   workflow_call:
     inputs:
+      platform:
+        description: 'The platform to build the image for'
+        required: true
+        type: string
       push-to-docker-hub:
         description: 'Whether the image should be pushed to Docker hub'
         required: true
@@ -23,13 +27,6 @@ on:
 jobs:
   build-image:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        platform:
-          - linux/amd64
-          - linux/arm/v7
-          - linux/arm64
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -77,5 +74,5 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        platforms: ${{ matrix.platform }}
+        platforms: ${{ inputs.platform }}
 
