@@ -48,7 +48,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix: 
-        platform: ${{ fromJson(env.PLATFORMS) }} 
+        platform: ${{ fromJson( ${{ env.PLATFORMS }} ) }} 
         subdir: ${{ fromJson(needs.enumerate-config-dirs.outputs.matrix) }}
     steps:
       - name: Checkout
