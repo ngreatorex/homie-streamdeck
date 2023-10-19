@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: ${{ fromJson(env.PLATFORMS) }}
+        platform: ${{ fromJson( ${{ env.PLATFORMS }} ) }}
     with:
       platform: ${{ matrix.platform }}
       push-to-docker-hub: ${{ github.event_name != 'pull_request' }}
