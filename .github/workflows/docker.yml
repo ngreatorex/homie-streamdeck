@@ -27,7 +27,7 @@ jobs:
       - name: Generate matrix with all config sub-directories
         id: set-matrix
         run: |
-          echo "::set-output name=matrix::$(ls -l config/ | grep '^d' | awk -F ' ' '{print $9}' | grep -v '^images$' | jq -R -s -c 'split("\n") | map(select(length > 0))')"
+          echo "::set-output name=matrix::$(ls -l config/ | grep '^d' | awk -F ' ' '{print $9}' | grep -v '^images$' | jq -R -s -c 'split(\"\n\") | map(select(length > 0))')"
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
 
@@ -38,10 +38,12 @@ jobs:
       fail-fast: false
       matrix:
         subdir: ${{ fromJson(needs.enumerate-config-dirs.outputs.matrix }}
+    with:
+      subdir: ${{ matrix.subdir }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Echo matrix
         run: |
-          echo "${{ matrix.subdir }}"
+          echo "${{ vars.subdir }}"
     
