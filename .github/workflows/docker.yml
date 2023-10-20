@@ -56,7 +56,7 @@ jobs:
       fail-fast: false
       matrix: 
         platform: ${{ fromJson(vars.DOCKER_PLATFORMS) }} 
-        config-name: ${{ fromJson(needs.enumerate-config-dirs.outputs.matrix) }}
+        config-name: ${{ fromJson(needs.enumerate-configs.outputs.matrix) }}
     uses: ./.github/workflows/build-docker-image.yml
     with:
       build-args: |

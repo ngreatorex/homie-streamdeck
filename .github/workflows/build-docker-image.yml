@@ -46,7 +46,7 @@ on:
     
 jobs:
   build-image:
-    name: Build Docker image in ${{ inputs.path }} for ${{ inputs.platform }}
+    name: Build Docker image
     runs-on: ubuntu-latest
     env:
       docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
