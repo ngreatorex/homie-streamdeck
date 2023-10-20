@@ -19,7 +19,7 @@ jobs:
       - id: set-matrix
         name: Generate matrix with all config sub-directories
         run: |
-          echo "matrix=$(ls -l config/ | grep '^d' | awk -F ' ' '{print $9}' | grep -v '^images$' | jq -R -s -c 'split("\n") | map(select(length > 0))') >> $GITHUB_OUTPUT"
+          echo "matrix=$(ls -l config/ | grep '^d' | awk -F ' ' '{print $9}' | grep -v '^images$' | jq -R -s -c 'split("\n") | map(select(length > 0))')" >> $GITHUB_OUTPUT
     outputs:
       test1: blah
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -53,7 +53,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Echo matrix
         env:
-          NEEDS: ${{ toJson(needs) }}
+          NEEDS: ${{ toJson(needs.enumerate-config-dirs) }}
         run: |
           echo "${{ matrix.subdir }}"
           echo "$NEEDS"
