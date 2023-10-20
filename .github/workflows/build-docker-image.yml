@@ -30,8 +30,16 @@ on:
         required: false
         default: ''
         type: string
-      image-suffix:
-        description: 'A suffix to add to each image name'
+      images:
+        description: 'The images to pass to the Docker metadata action'
+        required: true
+        type: string
+      tags:
+        description: 'The tags to pass to the Docker metadata action'
+        required: true
+        type: string
+      flavor:
+        description: 'The flavor to pass to the Docker metadata action'
         required: false
         default: ''
         type: string
@@ -55,18 +63,9 @@ jobs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        # list of Docker images to use as base name for tags
-        images: |
-          name=ngreatorex/homie-streamdeck${{ inputs.image-suffix }},enable=${{ inputs.push-to-docker-hub }}
-          name=ghcr.io/${{ github.actor }}/homie-streamdeck${{ inputs.image-suffix }},enable=${{ inputs.push-to-ghcr }}
-        # generate Docker tags based on the following events/attributes
-        tags: |
-          type=ref,event=branch
-          type=ref,event=pr
-          type=semver,pattern={{version}}
-          type=semver,pattern={{major}}.{{minor}}
-          type=semver,pattern={{major}}
-          type=sha
+        images: ${{ inputs.images }}
+        tags: ${{ inputs.tags }}
+        flavor: ${{ inputs.flavor }}
     - name: Get first tag 
       id: first-tag
       run: |
