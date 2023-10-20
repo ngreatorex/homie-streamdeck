@@ -43,7 +43,6 @@ on:
       DOCKERHUB_TOKEN:
         description: 'The token used to access Docker hub'
         required: false
-        default: ''
     
 jobs:
   build-image:
