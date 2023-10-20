@@ -47,15 +47,12 @@ jobs:
       fail-fast: false
       matrix: 
         platform: ${{ fromJson(vars.DOCKER_PLATFORMS) }} 
-        subdir: ["raspi-a"] #${{ needs.enumerate-config-dirs.outputs.matrix }}
+        subdir: ${{ fromJson(needs.enumerate-config-dirs.outputs.matrix) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Echo matrix
-        env:
-          NEEDS: ${{ toJson(needs.enumerate-config-dirs) }}
         run: |
           echo "${{ matrix.subdir }}"
-          echo "$NEEDS"
           echo "${{ toJson(needs) }}"
     
