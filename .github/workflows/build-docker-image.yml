@@ -19,6 +19,11 @@ on:
         description: 'The path to the Dockerfile to build'
         required: true
         type: string
+      build-args:
+        description: 'Build args to be passed to Docker build'
+        required: false
+        default: ''
+        type: string
     secrets:
       DOCKERHUB_TOKEN:
         description: 'The token used to access Docker hub'
@@ -70,9 +75,11 @@ jobs:
     - name: Build and push
       uses: docker/build-push-action@v5
       with:
+        build-args: ${{ inputs.build-args }}
         context: ${{ inputs.path }}
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         platforms: ${{ inputs.platform }}
-
+    outputs:
+      tags: ${{ toJson(steps.meta.outputs.tags) }}

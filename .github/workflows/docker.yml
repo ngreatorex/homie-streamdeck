@@ -42,12 +42,21 @@ jobs:
     needs: 
       - enumerate-config-dirs
       - build-base-image
-    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix: 
         platform: ${{ fromJson(vars.DOCKER_PLATFORMS) }} 
         subdir: ${{ fromJson(needs.enumerate-config-dirs.outputs.matrix) }}
+    uses: ./.github/workflows/build-docker-image.yml
+    with:
+      build-args:  |
+        FROM_IMAGE=${{ fromJson(needs.build-base-image.outputs.tags)[0] }}
+      platform: ${{ matrix.platform }}
+      push-to-docker-hub: ${{ github.event_name != 'pull_request' }}
+      push-to-ghcr: ${{ github.event_name == 'pull_request' }}
+      path: config/${{ matrix.subdir }}
+    secrets: inherit
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
