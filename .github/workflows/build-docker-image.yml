@@ -64,7 +64,7 @@ jobs:
     - name: Get first tag 
       id: first-tag
       run: |
-        echo "${{ toJson(steps.meta.outputs.tags) }}" | { mapfile -t; echo "tag=${MAPFILE[0]}" >> $GITHUB_OUTPUT }
+        echo "${{ toJson(steps.meta.outputs.tags) }}" | { mapfile -t; echo "tag=${MAPFILE[0]}" >> $GITHUB_OUTPUT; }
     - name: Login to Docker Hub
       uses: docker/login-action@v3
       if: inputs.push-to-docker-hub
