@@ -24,7 +24,7 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
   
-  build-base-mage:
+  build-base-image:
     name: Build base image
     needs: enumerate-configs
     uses: ./.github/workflows/build-docker-image.yml
