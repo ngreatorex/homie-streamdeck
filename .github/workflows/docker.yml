@@ -75,4 +75,3 @@ jobs:
       platform: ${{ matrix.platform }}
       path: config/
       file: config/Dockerfile.${{ matrix.config-name }}
-    secrets: inherit

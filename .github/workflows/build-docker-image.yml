@@ -42,7 +42,8 @@ on:
     secrets:
       DOCKERHUB_TOKEN:
         description: 'The token used to access Docker hub'
-        required: true
+        required: false
+        default: ''
     
 jobs:
   build-image:
@@ -64,13 +65,13 @@ jobs:
         echo -e ${{ toJson(steps.meta.outputs.tags) }} | { mapfile -t; echo "tag=${MAPFILE[0]}" >> $GITHUB_OUTPUT; echo "First tag: ${MAPFILE[0]}"; }
     - name: Login to Docker Hub
       uses: docker/login-action@v3
-      if: inputs.push-to-docker-hub
+      if: secrets.DOCKERHUB_TOKEN != ''
       with:
         username: ${{ vars.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Login to GHCR
       uses: docker/login-action@v3
-      if: inputs.push-to-ghcr
+      if: contains( inputs.images', 'ghcr.io' )
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
