@@ -24,6 +24,8 @@ on:
         required: false
         default: ''
         type: string
+    outputs:
+      tags: ${{ jobs.build-image.outputs.tags }}
     secrets:
       DOCKERHUB_TOKEN:
         description: 'The token used to access Docker hub'
