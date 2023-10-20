@@ -1,0 +1,77 @@
+name: Docker CI
+
+on:
+  push:
+    branches: [ "master" ]
+    tags: [ "v*.*.*" ]
+  pull_request:
+    branches: [ "master" ]
+  release:
+    types: [published]
+    
+jobs:
+
+  enumerate-configs:
+    name: Enumerate configs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - id: set-matrix
+        name: Generate matrix with all configured Dockerfiles
+        run: |
+          echo "matrix=$(ls -l config/Dockerfile.* | grep '^-' | awk -F ' ' '{print $9}' | { read x; echo "${x##*.}"; } | jq -R -s -c 'split("\n") | map(select(length > 0))')" >> $GITHUB_OUTPUT
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+  
+  build-base-image:
+    name: Build base image
+    needs: enumerate-configs
+    uses: ./.github/workflows/build-docker-image.yml
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: ${{ fromJson(vars.DOCKER_PLATFORMS) }}
+    with:
+      platform: ${{ matrix.platform }}
+      images: |
+        name=ngreatorex/homie-streamdeck,enable=${{ github.event_name != 'pull_request' }}
+        name=ghcr.io/${{ github.actor }}/homie-streamdeck,enable=${{ github.event_name == 'pull_request' }}
+      tags: |
+        type=ref,event=branch
+        type=ref,event=pr
+        type=semver,pattern={{version}}
+        type=semver,pattern={{major}}.{{minor}}
+        type=semver,pattern={{major}}
+        type=sha
+    secrets: inherit
+
+  build-configured-images:
+    name: Build configured images
+    #if: github.event_name != 'pull_request'
+    needs: 
+      - enumerate-configs
+      - build-base-image
+    strategy:
+      fail-fast: false
+      matrix: 
+        platform: ${{ fromJson(vars.DOCKER_PLATFORMS) }} 
+        config-name: ${{ fromJson(needs.enumerate-configs.outputs.matrix) }}
+    uses: ./.github/workflows/build-docker-image.yml
+    with:
+      build-args: |
+        FROM_IMAGE=${{ needs.build-base-image.outputs.tag }}
+      images: |
+        name=ghcr.io/${{ github.actor }}/homie-streamdeck-configured
+      flavor: |
+        suffix=_${{ matrix.config-name }}
+      tags: |
+        type=ref,event=branch
+        type=ref,event=pr
+        type=semver,pattern={{version}}
+        type=semver,pattern={{major}}.{{minor}}
+        type=semver,pattern={{major}}
+        type=sha
+      platform: ${{ matrix.platform }}
+      path: config/
+      file: config/Dockerfile.${{ matrix.config-name }}
