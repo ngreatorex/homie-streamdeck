@@ -38,6 +38,12 @@ jobs:
       path: .
     secrets: inherit
 
+  echo-needs:
+    needs: build-base-image
+    steps:
+      - run: |
+          echo "${{ toJson(needs) }}"
+
   build-config-images:
     needs: 
       - enumerate-config-dirs
@@ -49,7 +55,7 @@ jobs:
         subdir: ${{ fromJson(needs.enumerate-config-dirs.outputs.matrix) }}
     uses: ./.github/workflows/build-docker-image.yml
     with:
-      build-args:  |
+      build-args: |
         FROM_IMAGE=${{ fromJson(needs.build-base-image.outputs.tags)[0] }}
       platform: ${{ matrix.platform }}
       push-to-docker-hub: ${{ github.event_name != 'pull_request' }}
