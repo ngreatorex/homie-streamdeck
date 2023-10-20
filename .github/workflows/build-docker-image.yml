@@ -16,8 +16,14 @@ on:
         required: true
         type: boolean
       path:
-        description: 'The path to the Dockerfile to build'
-        required: true
+        description: 'The path to the build context'
+        required: false
+        default: .
+        type: string
+      file:
+        description: 'The path to the Dockerfile'
+        required: false
+        default: ./Dockerfile
         type: string
       build-args:
         description: 'Build args to be passed to Docker build'

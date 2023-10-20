@@ -37,7 +37,6 @@ jobs:
       platform: ${{ matrix.platform }}
       push-to-docker-hub: ${{ github.event_name != 'pull_request' }}
       push-to-ghcr: ${{ github.event_name == 'pull_request' }}
-      path: .
     secrets: inherit
 
   echo-needs:
@@ -64,7 +63,8 @@ jobs:
         FROM_IMAGE=${{ needs.build-base-image.outputs.tag }}
       image-suffix: "-config-${{ matrix.subdir }}"
       platform: ${{ matrix.platform }}
-      push-to-docker-hub: ${{ github.event_name != 'pull_request' }}
-      push-to-ghcr: ${{ github.event_name == 'pull_request' }}
-      path: config/${{ matrix.subdir }}
+      push-to-docker-hub: false
+      push-to-ghcr: true
+      path: config/
+      file: config/${{ matrix.subdir }}/Dockerfile
     secrets: inherit
