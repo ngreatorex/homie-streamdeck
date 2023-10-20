@@ -15,7 +15,7 @@ on:
       file:
         description: 'The path to the Dockerfile'
         required: false
-        default: ${{ inputs.path }}/Dockerfile
+        default: ./Dockerfile
         type: string
       build-args:
         description: 'Build args to be passed to Docker build'
