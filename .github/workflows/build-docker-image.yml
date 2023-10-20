@@ -96,6 +96,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         build-args: ${{ inputs.build-args }}
+        file: ${{ inputs.file }}
         context: ${{ inputs.path }}
         push: true
         tags: ${{ steps.meta.outputs.tags }}

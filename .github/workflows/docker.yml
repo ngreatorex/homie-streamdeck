@@ -39,14 +39,6 @@ jobs:
       push-to-ghcr: ${{ github.event_name == 'pull_request' }}
     secrets: inherit
 
-  echo-needs:
-    name: Echo needs context
-    needs: build-base-image
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          echo "${{ toJson(needs) }}"
-
   build-config-images:
     name: Build config images
     needs: 
