@@ -57,7 +57,8 @@ jobs:
     uses: ./.github/workflows/build-docker-image.yml
     with:
       build-args: |
-        FROM_IMAGE=${{ fromJson(needs.build-base-image.outputs.tags)[0] }}
+        FROM_IMAGE=${{ needs.build-base-image.outputs.tag }}
+      image-suffix: "-config-${{ matrix.subdir }}"
       platform: ${{ matrix.platform }}
       push-to-docker-hub: ${{ github.event_name != 'pull_request' }}
       push-to-ghcr: ${{ github.event_name == 'pull_request' }}
