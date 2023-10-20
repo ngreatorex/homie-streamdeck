@@ -12,6 +12,7 @@ on:
 jobs:
 
   enumerate-config-dirs:
+    name: Enumerate config directories
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -25,6 +26,7 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
   
   build-base-image:
+    name: Build base image
     needs: enumerate-config-dirs
     uses: ./.github/workflows/build-docker-image.yml
     strategy:
@@ -39,6 +41,7 @@ jobs:
     secrets: inherit
 
   echo-needs:
+    name: Echo needs context
     needs: build-base-image
     runs-on: ubuntu-latest
     steps:
@@ -46,6 +49,7 @@ jobs:
           echo "${{ toJson(needs) }}"
 
   build-config-images:
+    name: Build config images
     needs: 
       - enumerate-config-dirs
       - build-base-image
