@@ -56,7 +56,7 @@ jobs:
       fail-fast: false
       matrix: 
         platform: ${{ fromJson(vars.DOCKER_PLATFORMS) }} 
-        config-name: ${{ fromJson(needs.enumerate-configs.outputs.matrix) }}
+        dockerfile-name: ${{ fromJson(needs.enumerate-configs.outputs.matrix) }}
     uses: ./.github/workflows/build-docker-image.yml
     with:
       build-args: |
@@ -64,7 +64,7 @@ jobs:
       images: |
         name=ghcr.io/${{ github.actor }}/homie-streamdeck-configured
       flavor: |
-        suffix=_${{ matrix.config-name }}
+        suffix=_${{ matrix.dockerfile-name }}
       tags: |
         type=ref,event=branch
         type=ref,event=pr
@@ -74,4 +74,4 @@ jobs:
         type=sha
       platform: ${{ matrix.platform }}
       path: config/
-      file: config/Dockerfile.${{ matrix.config-name }}
+      file: ${{ matrix.dockerfile-name }}
