@@ -1,11 +1,10 @@
 ARG FROM_IMAGE=ngreatorex/homie-streamdeck:master
 FROM $FROM_IMAGE
 
-WORKDIR /app
-
 COPY config.json /app/
-COPY images /app/
+COPY images /app/images/
 
+WORKDIR /app
 RUN ln -s images/Main_Off.png 0.png
 RUN ln -s images/Uplight_Off.png 1.png
 RUN ln -s images/Porch_Off.png 2.png
