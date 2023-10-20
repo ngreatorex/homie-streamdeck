@@ -3,8 +3,8 @@ FROM $FROM_IMAGE
 
 WORKDIR /app
 
-COPY ./config.json .
-COPY ./images .
+COPY config.json ./
+COPY images ./
 
 RUN ln -s images/Main_Off.png 0.png
 RUN ln -s images/Uplight_Off.png 1.png
