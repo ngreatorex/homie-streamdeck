@@ -7,14 +7,6 @@ on:
         description: 'The platform to build the image for'
         required: true
         type: string
-      push-to-docker-hub:
-        description: 'Whether the image should be pushed to Docker hub'
-        required: true
-        type: boolean
-      push-to-ghcr:
-        description: 'Whether the image should be pushed to GHCR'
-        required: true
-        type: boolean
       path:
         description: 'The path to the build context'
         required: false
