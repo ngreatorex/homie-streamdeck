@@ -11,44 +11,35 @@ on:
     
 jobs:
 
-  enumerate-configs:
-    name: Enumerate configs
+  configure-jobs:
+    name: Configure jobs
     runs-on: ubuntu-latest
+    env:
+      docker.io-image: ngreatorex/homie-streamdeck
+      ghcr-image: ghcr.io/ngreatorex/homie-streamdeck
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - id: set-matrix
-        name: Generate matrix with all configured Dockerfiles
+        name: Enumerate all configured Dockerfiles
         run: |
           echo "matrix=$(ls -l config/Dockerfile.* | grep '^-' | awk -F ' ' '{print $9}' | { read x; echo "${x##*.}"; } | jq -R -s -c 'split("\n") | map(select(length > 0))')" >> $GITHUB_OUTPUT
+      - id: set-image
+        name: Choose repository for Docker image
+        run: |
+          [ "${{ github.event_name == 'pull_request' }}" = "true" ] && echo "image=${{ env.ghcr-image }}" >> $GITHUB_OUTPUT || true
+          [ "${{ github.event_name != 'pull_request' }}" = "true" ] && echo "image=${{ env.docker.io-image }}" >> $GITHUB_OUTPUT || true
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+      image: ${{ steps.set-image.outputs.image }}
   
-  build-base-image-docker-hub:
-    name: Build base image for Docker hub
-    needs: enumerate-configs
+  build-base-image:
+    name: Build base image
+    needs: configure-jobs
     uses: ./.github/workflows/build-docker-image.yml
-    if: ${{ github.event_name != 'pull_request' }}
     with:
       platforms: ${{ vars.DOCKER_PLATFORMS }}
-      image: ngreatorex/homie-streamdeck
-      tags: |
-        type=ref,event=branch
-        type=ref,event=pr
-        type=semver,pattern={{version}}
-        type=semver,pattern={{major}}.{{minor}}
-        type=semver,pattern={{major}}
-        type=sha
-    secrets: inherit
-
-  build-base-image-ghcr:
-    name: Build base image for GitHub Container Registry
-    needs: enumerate-configs
-    uses: ./.github/workflows/build-docker-image.yml
-    if: ${{ github.event_name == 'pull_request' }}
-    with:
-      platforms: ${{ vars.DOCKER_PLATFORMS }}
-      image: ghcr.io/${{ github.actor }}/homie-streamdeck
+      image: ${{ needs.configure-jobs.outputs.image }}
       tags: |
         type=ref,event=branch
         type=ref,event=pr
@@ -60,19 +51,18 @@ jobs:
 
   build-configured-images:
     name: Build configured images
-    if: "github.event_name != 'pull_request' && ${{ always() }}"
+    #if: "github.event_name != 'pull_request'"
     needs: 
-      - enumerate-configs
-      - build-base-image-docker-hub
-      - build-base-image-ghcr
+      - configure-jobs
+      - build-base-image
     strategy:
       fail-fast: false
       matrix: 
-        config-name: ${{ fromJson(needs.enumerate-configs.outputs.matrix) }}
+        config-name: ${{ fromJson(needs.configure-jobs.outputs.matrix) }}
     uses: ./.github/workflows/build-docker-image.yml
     with:
       build-args: |
-        FROM_IMAGE=${{ needs.build-base-image-docker-hub.outputs.tag || needs.build-base-image-ghcr.outputs.tag }}
+        FROM_IMAGE=${{ needs.build-base-image.outputs.tag }}
       image: ghcr.io/${{ github.actor }}/homie-streamdeck-configured
       flavor: |
         suffix=_${{ matrix.config-name }}
