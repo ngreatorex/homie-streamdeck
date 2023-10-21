@@ -70,13 +70,13 @@ jobs:
         echo -e ${{ toJson(steps.meta.outputs.tags) }} | { mapfile -t; echo "tag=${MAPFILE[0]}" >> $GITHUB_OUTPUT; echo "First tag: ${MAPFILE[0]}"; }
     - name: Login to Docker Hub
       uses: docker/login-action@v3
-      if: !contains( inputs.image, 'ghcr.io' )
+      if: "!contains( inputs.image, 'ghcr.io' )"
       with:
         username: ${{ vars.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Login to GHCR
       uses: docker/login-action@v3
-      if: contains( inputs.image, 'ghcr.io' )
+      if: "contains( inputs.image, 'ghcr.io' )"
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
