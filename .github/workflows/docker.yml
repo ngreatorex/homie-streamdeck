@@ -60,7 +60,7 @@ jobs:
 
   build-configured-images:
     name: Build configured images
-    #if: github.event_name != 'pull_request'
+    if: "github.event_name != 'pull_request' && ${{ always() }}"
     needs: 
       - enumerate-configs
       - build-base-image-docker-hub
