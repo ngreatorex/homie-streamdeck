@@ -63,7 +63,8 @@ jobs:
     #if: github.event_name != 'pull_request'
     needs: 
       - enumerate-configs
-      - build-base-image
+      - build-base-image-docker-hub
+      - build-base-image-ghcr
     strategy:
       fail-fast: false
       matrix: 
@@ -71,7 +72,7 @@ jobs:
     uses: ./.github/workflows/build-docker-image.yml
     with:
       build-args: |
-        FROM_IMAGE=${{ needs.build-base-image.outputs.tag }}
+        FROM_IMAGE=${{ needs.build-base-image-docker-hub.outputs.tag || needs.build-base-image-ghcr.outputs.tag }}
       image: ghcr.io/${{ github.actor }}/homie-streamdeck-configured
       flavor: |
         suffix=_${{ matrix.config-name }}
