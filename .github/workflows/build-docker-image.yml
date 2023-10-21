@@ -94,8 +94,8 @@ jobs:
         build-args: ${{ inputs.build-args }}
         file: ${{ inputs.file }}
         context: ${{ inputs.path }}
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
+        #push: true
+        #tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         platforms: ${{ matrix.platform }}
         outputs: type=image,push-by-digest=true,push=true,name-canonical=true
