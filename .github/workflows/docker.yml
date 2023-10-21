@@ -15,22 +15,22 @@ jobs:
     name: Configure jobs
     runs-on: ubuntu-latest
     env:
-      docker.io-image: ngreatorex/homie-streamdeck
+      docker-hub-image: ngreatorex/homie-streamdeck
       ghcr-image: ghcr.io/ngreatorex/homie-streamdeck
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - id: set-matrix
+      - id: set-configs
         name: Enumerate all configured Dockerfiles
         run: |
-          echo "matrix=$(ls -l config/Dockerfile.* | grep '^-' | awk -F ' ' '{print $9}' | { read x; echo "${x##*.}"; } | jq -R -s -c 'split("\n") | map(select(length > 0))')" >> $GITHUB_OUTPUT
+          echo "configs=$(ls -l config/Dockerfile.* | grep '^-' | awk -F ' ' '{print $9}' | { read x; echo "${x##*.}"; } | jq -R -s -c 'split("\n") | map(select(length > 0))')" >> $GITHUB_OUTPUT
       - id: set-image
         name: Choose repository for Docker image
         run: |
           [ "${{ github.event_name == 'pull_request' }}" = "true" ] && echo "image=${{ env.ghcr-image }}" >> $GITHUB_OUTPUT || true
-          [ "${{ github.event_name != 'pull_request' }}" = "true" ] && echo "image=${{ env.docker.io-image }}" >> $GITHUB_OUTPUT || true
+          [ "${{ github.event_name != 'pull_request' }}" = "true" ] && echo "image=${{ env.docker-hub-image }}" >> $GITHUB_OUTPUT || true
     outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      configs: ${{ steps.set-configs.outputs.configs }}
       image: ${{ steps.set-image.outputs.image }}
   
   build-base-image:
@@ -58,7 +58,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix: 
-        config-name: ${{ fromJson(needs.configure-jobs.outputs.matrix) }}
+        config-name: ${{ fromJson(needs.configure-jobs.outputs.configs) }}
     uses: ./.github/workflows/build-docker-image.yml
     with:
       build-args: |
