@@ -51,7 +51,7 @@ jobs:
     steps:
       - name: Generate ID
         id: id
-        run: 'printf "id=%s\n" `uuidgen` >> ${GITHUB_OUTPUTS}'
+        run: 'printf "id=%s\n" `uuidgen` >> ${GITHUB_OUTPUT}'
     outputs:
       id: ${{ steps.id.outputs.id }}
   build:
