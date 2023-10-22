@@ -23,7 +23,7 @@ jobs:
       - id: set-configs
         name: Enumerate all configured Dockerfiles
         run: |
-          echo "configs=$(ls -l config/Dockerfile.* | grep '^-' | awk -F ' ' '{print $9}' | { read x; echo "${x##*.}"; } | jq -R -s -c 'split("\n") | map(select(length > 0))')" >> $GITHUB_OUTPUT
+          echo "configs=$(ls -l config/Dockerfile.* | grep '^-' | awk -F ' ' '{print $9}' | { while read x; do echo "${x##*.}"; done; } | jq -R -s -c 'split("\n") | map(select(length > 0))')" >> $GITHUB_OUTPUT
       - id: set-image
         name: Choose repository for Docker image
         run: |
