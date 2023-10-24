@@ -23,15 +23,20 @@ jobs:
       - id: set-configs
         name: Enumerate all configured Dockerfiles
         run: |
-          echo "configs=$(ls -l config/Dockerfile.* | grep '^-' | awk -F ' ' '{print $9}' | { read x; echo "${x##*.}"; } | jq -R -s -c 'split("\n") | map(select(length > 0))')" >> $GITHUB_OUTPUT
-      - id: set-image
+          echo "configs=$(ls -l config/Dockerfile.* | grep '^-' | awk -F ' ' '{print $9}' | { while read x; do echo "${x##*.}"; done; } | jq -R -s -c 'split("\n") | map(select(length > 0))')" >> $GITHUB_OUTPUT
+      - id: choose-repo
         name: Choose repository for Docker image
         run: |
-          [ "${{ github.event_name == 'pull_request' }}" = "true" ] && echo "image=${{ env.ghcr-image }}" >> $GITHUB_OUTPUT || true
-          [ "${{ github.event_name != 'pull_request' }}" = "true" ] && echo "image=${{ env.docker-hub-image }}" >> $GITHUB_OUTPUT || true
+          {
+            [ "${{ github.event_name == 'pull_request' }}" = "true" ] && echo "image=${{ env.ghcr-image }}" || echo "image=${{ env.docker-hub-image }}"
+            [ "${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}" = "true" ] && echo "is-push-to-master=true" || echo "is-push-to-master=false" 
+            [ "${{ github.event_name == 'release' }}" = "true" ] && echo "is-release=true" || echo "is-release=false" 
+          } >> $GITHUB_OUTPUT
     outputs:
       configs: ${{ steps.set-configs.outputs.configs }}
-      image: ${{ steps.set-image.outputs.image }}
+      image: ${{ steps.choose-repo.outputs.image }}
+      is-push-to-master: ${{ steps.choose-repo.outputs.is-push-to-master }}
+      is-release: ${{ steps.choose-repo.outputs.is-release }}
   
   build-base-image:
     name: Build base image
@@ -64,6 +69,7 @@ jobs:
         FROM_IMAGE=${{ needs.build-base-image.outputs.tag }}
       image: ghcr.io/${{ github.actor }}/homie-streamdeck-configured
       flavor: |
+        latest=false
         suffix=_${{ matrix.config-name }}
       tags: |
         type=ref,event=branch
