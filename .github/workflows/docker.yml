@@ -42,6 +42,7 @@ jobs:
     name: Build base image
     needs: configure-jobs
     uses: ./.github/workflows/build-docker-image.yml
+    secrets: inherit
     with:
       platforms: ${{ vars.DOCKER_PLATFORMS }}
       image: ${{ needs.configure-jobs.outputs.image }}
@@ -52,7 +53,6 @@ jobs:
         type=semver,pattern={{major}}.{{minor}}
         type=semver,pattern={{major}}
         type=sha
-    secrets: inherit
 
   build-configured-images:
     name: Build configured images
@@ -64,6 +64,7 @@ jobs:
       matrix: 
         config-name: ${{ fromJson(needs.configure-jobs.outputs.configs) }}
     uses: ./.github/workflows/build-docker-image.yml
+    secrets: inherit
     with:
       build-args: |
         FROM_IMAGE=${{ needs.build-base-image.outputs.tag }}
