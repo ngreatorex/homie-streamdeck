@@ -56,6 +56,7 @@ jobs:
 
   build-configured-images:
     name: Build configured images
+    if: github.event_name != "pull_request"
     needs: 
       - configure-jobs
       - build-base-image
