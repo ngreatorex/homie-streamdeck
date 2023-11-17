@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       docker-hub-image: ${{ vars.DOCKERHUB_USERNAME }}/homie-streamdeck
-      ghcr-image: ghcr.io/${{ github.repository-owner }}/homie-streamdeck
+      ghcr-image: ghcr.io/${{ github.repository_owner }}/homie-streamdeck
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -68,7 +68,7 @@ jobs:
     with:
       build-args: |
         FROM_IMAGE=${{ needs.build-base-image.outputs.tag }}
-      image: ghcr.io/${{ github.repository-owner }}/homie-streamdeck-configured
+      image: ghcr.io/${{ github.repository_owner }}/homie-streamdeck-configured
       flavor: |
         latest=false
         suffix=_${{ matrix.config-name }}
