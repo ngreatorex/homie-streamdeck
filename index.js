@@ -3,6 +3,7 @@ import { HomieDevice } from '@ngreatorex/homie-device';
 import path from 'path';
 import sharp from 'sharp';
 import { default as winston, format, transports } from 'winston';
+import process from 'process';
 
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
@@ -111,6 +112,11 @@ myHomieDevice.on('connect', () => {
 	for (let i = 0; i < buttonNodes.length; i++) {
 		buttonNodes[i].getProperty('pressed').publishValue('false');
 	}
+});
+
+myHomieDevice.on('error', err => {
+	logger.error('Received error from Homie device: %s', err);
+	process.exit(-1);
 });
 
 myHomieDevice.setup();
