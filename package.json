@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@ngreatorex/homie-device": "0.2.1-pre",
-    "@elgato-stream-deck/node": "^5.3.1",
+    "@elgato-stream-deck/node": "^7.5.2",
     "sharp": "^0.32.6",
     "winston": "^3.6.0"
   }
