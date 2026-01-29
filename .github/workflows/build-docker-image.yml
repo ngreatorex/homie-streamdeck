@@ -72,7 +72,7 @@ jobs:
       ghcr-token: ${{ secrets.GHCR_TOKEN }}
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - name: Docker meta
       id: meta
       uses: docker/metadata-action@v5
@@ -117,7 +117,7 @@ jobs:
         digest="${{ steps.build.outputs.digest }}"
         touch "/tmp/digests/${digest#sha256:}"
     - name: Upload digest
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v6
       with:
         name: digests-${{ needs.generate-id.outputs.id }}
         path: /tmp/digests/*
