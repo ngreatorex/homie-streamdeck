@@ -130,6 +130,8 @@ jobs:
     needs:
       - generate-id
       - build
+    permissions:
+      packages: write
     steps:
       - name: Download digests
         uses: actions/download-artifact@v7
