@@ -132,7 +132,7 @@ jobs:
       - build
     steps:
       - name: Download digests
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v7
         with:
           pattern: digests-*-${{ needs.generate-id.outputs.id }}
           merge-multiple: true
@@ -161,7 +161,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
-          password: ${{ secrets.GHCR_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Create manifest list and push
         working-directory: /tmp/digests
         run: |
