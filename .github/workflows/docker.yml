@@ -14,6 +14,7 @@ jobs:
   configure-jobs:
     name: Configure jobs
     runs-on: ubuntu-latest
+    permissions: {}
     env:
       docker-hub-image: ${{ vars.DOCKERHUB_USERNAME }}/homie-streamdeck
       ghcr-image: ghcr.io/${{ github.repository_owner }}/homie-streamdeck
