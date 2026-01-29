@@ -43,9 +43,6 @@ on:
       DOCKERHUB_TOKEN:
         description: 'The token used to access Docker hub'
         required: false
-      GHCR_TOKEN:
-        description: 'The token to push to GHCR'
-        required: false
     
 jobs:
   generate-id:
@@ -71,8 +68,10 @@ jobs:
       docker-username: ${{ vars.DOCKERHUB_USERNAME }}
       docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
       ghcr-username: ${{ github.repository_owner }}
-      ghcr-token: ${{ secrets.GHCR_TOKEN }}
+      platform: ${{ matrix.platform }}
     steps:
+    - name: Sanitize platform for artifact
+      run: echo "platform=${platform////_}" >> $GITHUB_ENV
     - name: Checkout
       uses: actions/checkout@v6
     - name: Docker meta
@@ -121,7 +120,7 @@ jobs:
     - name: Upload digest
       uses: actions/upload-artifact@v6
       with:
-        name: digests-${{ matrix.platform }}$-{{ needs.generate-id.outputs.id }}
+        name: digests-${{ env.platform }}$-{{ needs.generate-id.outputs.id }}
         path: /tmp/digests/*
         if-no-files-found: error
         retention-days: 1
