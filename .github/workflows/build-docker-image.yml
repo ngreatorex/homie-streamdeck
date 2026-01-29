@@ -48,6 +48,7 @@ jobs:
   generate-id:
     name: Generate unique ID for this run
     runs-on: ubuntu-latest
+    permissions: {}
     steps:
       - name: Generate ID
         id: id
