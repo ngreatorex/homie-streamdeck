@@ -42,7 +42,8 @@ jobs:
   build-base-image:
     name: Build base image
     needs: configure-jobs
-    permissions: {}
+    permissions:
+      packages: write
     uses: ./.github/workflows/build-docker-image.yml
     secrets: inherit
     with:
