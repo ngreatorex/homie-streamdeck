@@ -62,7 +62,8 @@ jobs:
     needs: 
       - configure-jobs
       - build-base-image
-    permissions: {}
+    permissions:
+      packages: write
     strategy:
       fail-fast: false
       matrix: 
