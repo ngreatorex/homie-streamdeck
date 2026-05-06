@@ -20,7 +20,7 @@ jobs:
       ghcr-image: ghcr.io/${{ github.repository_owner }}/homie-streamdeck
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - id: set-configs
         name: Enumerate all configured Dockerfiles
         run: |
@@ -42,6 +42,8 @@ jobs:
   build-base-image:
     name: Build base image
     needs: configure-jobs
+    permissions:
+      packages: write
     uses: ./.github/workflows/build-docker-image.yml
     secrets: inherit
     with:
@@ -61,6 +63,8 @@ jobs:
     needs: 
       - configure-jobs
       - build-base-image
+    permissions:
+      packages: write
     strategy:
       fail-fast: false
       matrix: 
